@@ -1,0 +1,66 @@
+<languageVersion : 1.0;>
+
+kernel NewFilter
+<   namespace : "Wave";
+    vendor : "Abarrow Co.";
+    version : 1;
+    description : "Cool ripple effect.";
+>
+{
+    input image4 src;
+    output pixel4 dst;
+    
+    parameter float wave_size
+    <
+    minValue:float(0);
+    maxValue:float(100);
+    defaultValue:float(10.0);
+    >;
+    
+    parameter float wave_x
+    <
+    minValue:float(0);
+    maxValue:float(1000);
+    defaultValue:float(0.0);
+    >;
+    
+    parameter float wave_y
+    <
+    minValue:float(0);
+    maxValue:float(1000);
+    defaultValue:float(0.0);
+    >;
+    
+    parameter float wave_stage
+    <
+    minValue:float(0);
+    maxValue:float(1);
+    defaultValue:float(0.0);
+    >;
+    
+    parameter float max_dis
+    <
+    minValue:float(0);
+    maxValue:float(10000);
+    defaultValue:float(10000);
+    >;
+    
+    const float PI=3.1415926;
+    void
+    evaluatePixel()
+    {
+        float2 cord=outCoord();
+        float a=cord.x;
+        float b=cord.y;
+        float ae=cord.x-wave_x;
+        float be=cord.y-wave_y;
+        float c=sqrt(ae*ae+be*be);
+        if(c<max_dis){
+            float remain=mod(c+wave_size*wave_stage,wave_size);
+            float mi=sin(remain/wave_size*PI);
+            cord.x=max(a-remain*(mi),0.0);
+            cord.y=max(b-remain*(mi),0.0);
+        }
+        dst = sampleNearest(src, cord);
+    }
+}
